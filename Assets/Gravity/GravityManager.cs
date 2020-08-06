@@ -6,35 +6,40 @@ using UnityEngine;
 
 public class GravityManager : MonoBehaviour {
 
-	private GravityBody[] bodies;
 
-	void Start () {
+	private GravityBody[] bodies;
+	public float GConstant;
+
+	private static GravityManager Instance;
+	private static float G => Instance.GConstant;
+
+	void Start() {
 		bodies = FindObjectsOfType<GravityBody>();
+		Instance = this;
 	}
 
 	// Update is called once per frame
-	void FixedUpdate () {
+	void FixedUpdate() {
 		TreeBuilder builder = new TreeBuilder(bodies, InitialSizePower);
 		var node = builder.BuildTree();
 
 		CalculateForces(node, node);
 	}
 
-	private int LargestMagnitudeRounded => (int) Mathf.Round(GetLargestMagnitude());
-	private int InitialSizePower => (int) (Mathf.Round(Mathf.Log((int) GetLargestMagnitude(), 2))) + 1;
+	private int InitialSizePower => (int)(Mathf.Ceil(Mathf.Log(GetLargestMagnitude(), 2))) + 1;
 
-	public void CalculateForces (GravityNode node, GravityNode root) {
+	public void CalculateForces(GravityNode node, GravityNode root) {
 		if (node.IsLeaf) {
-			var leaf = (LeafNode) node;
+			var leaf = (LeafNode)node;
 			leaf.Body.Rigidbody.AddForce(CalculateTreeForce(node, root), ForceMode.Impulse);
 		} else {
-			foreach (var subNode in ((ParentNode) node).SubNodes)
+			foreach (var subNode in ((ParentNode)node).SubNodes)
 				if (subNode != null)
 					CalculateForces(subNode, root);
 		}
 	}
 
-	private float GetLargestMagnitude () {
+	private float GetLargestMagnitude() {
 		float output = 0;
 
 		foreach (var body in bodies) {
@@ -47,15 +52,14 @@ public class GravityManager : MonoBehaviour {
 	}
 
 	const float gravityRatio = 0.5f;
-	const float G = 6.674e-2f;
 
-	public static Vector3 CalculateTreeForce (GravityNode target, GravityNode tree) {
-		if (tree.IsLeaf || ((ParentNode) tree).Size / Vector3.Distance(target.CentreOfMass, tree.CentreOfMass) < gravityRatio) {
+	public static Vector3 CalculateTreeForce(GravityNode target, GravityNode tree) {
+		if (tree.IsLeaf || ((ParentNode)tree).Size / Vector3.Distance(target.CentreOfMass, tree.CentreOfMass) < gravityRatio) {
 			return CalculateForce(target, tree);
 		} else {
 			var force = Vector3.zero;
 
-			foreach (var subNode in ((ParentNode) tree).SubNodes) {
+			foreach (var subNode in ((ParentNode)tree).SubNodes) {
 				if (subNode != null) {
 					force += CalculateTreeForce(target, subNode);
 				}
@@ -65,7 +69,7 @@ public class GravityManager : MonoBehaviour {
 		}
 	}
 
-	public static Vector3 CalculateForce (GravityNode target, GravityNode tree) {
+	public static Vector3 CalculateForce(GravityNode target, GravityNode tree) {
 		if (target == tree)
 			return Vector3.zero;
 

@@ -23,7 +23,6 @@ public class TreeBuilder {
 		}
 
 		var seperatedBodies = new List<GravityBody>[8];
-		float size = Mathf.Pow(2, power);
 
 		foreach (var body in bodies) {
 			foreach (Region region in Enum.GetValues(typeof(Region))) {
@@ -32,6 +31,7 @@ public class TreeBuilder {
 						seperatedBodies[(int) region] = new List<GravityBody>();
 
 					seperatedBodies[(int) region].Add(body);
+					break;
 				}
 			}
 		}
