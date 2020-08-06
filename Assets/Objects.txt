@@ -1,0 +1,8 @@
+Total Mass: 14630	Centre of mass: (-13.9, -14.5, -35.6)	Cell Size: 128
+  ├─Mass: 504	Centre of mass: (-30.8, -14.5, 0.5)	Force: (-701.3, 0.0, -758.7)
+  └─Total Mass: 14126	Centre of mass: (-13.3, -14.5, -36.9)	Cell Size: 64
+      ├─Total Mass: 4252	Centre of mass: (-42.3, -14.5, -3.0)	Cell Size: 32
+      │   └─Total Mass: 4252	Centre of mass: (-42.3, -14.5, -3.0)	Cell Size: 16
+      │       ├─Mass: 3250	Centre of mass: (-45.0, -14.5, -2.0)	Force: (2184.0, 0.0, -767.6)
+      │       └─Mass: 1002	Centre of mass: (-33.5, -14.5, -6.3)	Force: (-988.6, 0.0, 911.7)
+      └─Mass: 9874	Centre of mass: (-0.8, -14.5, -51.5)	Force: (-493.2, 0.0, 602.7)
