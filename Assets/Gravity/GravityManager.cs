@@ -10,16 +10,19 @@ public class GravityManager : MonoBehaviour {
 	private GravityBody[] bodies;
 	public float GConstant;
 
-	private static GravityManager Instance;
+	public static GravityManager Instance { get; private set; }
 	private static float G => Instance.GConstant;
 
-	void Start() {
+	void Awake() {
 		bodies = FindObjectsOfType<GravityBody>();
 		Instance = this;
 	}
 
-	// Update is called once per frame
-	void FixedUpdate() {
+	private void FixedUpdate () {
+		UpdateForces();
+	}
+
+	private void UpdateForces() {
 		TreeBuilder builder = new TreeBuilder(bodies, InitialSizePower);
 		var node = builder.BuildTree();
 
@@ -31,7 +34,7 @@ public class GravityManager : MonoBehaviour {
 	public void CalculateForces(GravityNode node, GravityNode root) {
 		if (node.IsLeaf) {
 			var leaf = (LeafNode)node;
-			leaf.Body.Rigidbody.AddForce(CalculateTreeForce(node, root), ForceMode.Impulse);
+			leaf.Body.Force = CalculateTreeForce(node, root);
 		} else {
 			foreach (var subNode in ((ParentNode)node).SubNodes)
 				if (subNode != null)
