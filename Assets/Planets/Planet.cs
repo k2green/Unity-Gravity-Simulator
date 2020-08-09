@@ -1,45 +1,56 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Planet : MonoBehaviour {
 
-	[Range(2, 256)]
-	public int resolution=4;
+	private PlanetFace[] faces;
+	private MeshFilter[] filters;
 
-	private MeshFilter[] meshFilters;
-	private Face[] faces;
-
-	private Vector3[] directions = { Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
-
-	private void OnValidate () {
+	private void Start () {
 		Initialise();
-		GenerateMesh();
+		GenerateMeshes();
+	}
+
+	private void CreateFaceGameObject (Face face) {
+		var faceObject = new GameObject($"{face} Face");
+		faceObject.transform.parent = transform;
+
+		faceObject.transform.localPosition = Vector3.zero;
+		faceObject.transform.localScale = Vector3.one;
+		faceObject.transform.localEulerAngles = Vector3.zero;
+
+		faceObject.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("HDRP/Lit"));
+		filters[(int) face] = faceObject.AddComponent<MeshFilter>();
+
+		if (filters[(int) face].sharedMesh == null)
+			filters[(int) face].sharedMesh = new Mesh();
 	}
 
 	private void Initialise () {
-		if (meshFilters == null || meshFilters.Length == 0)
-			meshFilters = new MeshFilter[6];
+		if (faces != null && filters != null && faces.Length == 6 && faces.Length == 6) return;
 
-		faces = new Face[6];
+		faces = new PlanetFace[6];
+		filters = new MeshFilter[6];
 
-		for (int i = 0; i < 6; i++) {
-			if (meshFilters[i] == null) {
-				GameObject faceObject = new GameObject($"Face {i}");
-				faceObject.transform.parent = transform;
+		foreach (Face face in Enum.GetValues(typeof(Face))) {
+			CreateFaceGameObject(face);
 
-				faceObject.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("HDRP/Lit"));
-				meshFilters[i] = faceObject.AddComponent<MeshFilter>();
-				meshFilters[i].sharedMesh = new Mesh();
-			}
-
-			faces[i] = new Face(meshFilters[i].sharedMesh, resolution, directions[i]);
+			faces[(int) face] = new PlanetFace(face.GetUpVector());
 		}
 	}
 
-	private void GenerateMesh () {
-		foreach (var face in faces) {
-			face.ConstructMesh();
+	private void GenerateMeshes () {
+		for (int i = 0; i < 6; i++) {
+			var mesh = filters[i].sharedMesh;
+			mesh.Clear();
+
+			var (vertices, triangles) = faces[i].CreateMeshData();
+			mesh.vertices = vertices.ToArray();
+			mesh.triangles = triangles.ToArray();
+
+			mesh.RecalculateNormals();
 		}
 	}
 }
