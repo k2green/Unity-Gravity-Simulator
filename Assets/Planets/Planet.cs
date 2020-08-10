@@ -8,7 +8,7 @@ public class Planet : MonoBehaviour {
 	private PlanetFace[] faces;
 	private MeshFilter[] filters;
 
-	private void Start () {
+	private void Update () {
 		Initialise();
 		GenerateMeshes();
 	}
@@ -37,7 +37,7 @@ public class Planet : MonoBehaviour {
 		foreach (Face face in Enum.GetValues(typeof(Face))) {
 			CreateFaceGameObject(face);
 
-			faces[(int) face] = new PlanetFace(face.GetUpVector());
+			faces[(int) face] = new PlanetFace(face.GetUpVector(), filters[(int) face].transform);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class Planet : MonoBehaviour {
 			var mesh = filters[i].sharedMesh;
 			mesh.Clear();
 
-			var (vertices, triangles) = faces[i].CreateMeshData();
+			var (vertices, triangles) = faces[i].GetMeshData();
 			mesh.vertices = vertices.ToArray();
 			mesh.triangles = triangles.ToArray();
 

@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlanetChunk {
+public class PlanetChunk : IChunk {
 
-	public const int Resolution = 5;
-	private readonly int vertexOffset;
+	public const int Resolution = 2;
 
-	public PlanetChunk (Vector3 localUp, Vector3 axisA, Vector3 axisB, Vector3 position, float scaleFactor, int depth, int vertexOffset) {
+	public PlanetChunk(Vector3 localUp, Vector3 axisA, Vector3 axisB, Vector3 position, float scaleFactor, int depth) {
 		LocalUp = localUp;
 		Position = position;
 		ScaleFactor = scaleFactor;
-		Depth = depth;
+		DetailLevel = depth;
 
 		AxisA = axisA;
 		AxisB = axisB;
-
-		this.vertexOffset = vertexOffset;
 	}
 
-	public (List<Vector3>, List<int>) CreateMeshData () {
-		CreateVertices();
-		CreateTriangles();
-
+	public (List<Vector3>, List<int>) GetMeshData() {
 		return (Vertices, Triangles);
 	}
 
-	private void CreateVertices () {
+	public int GenerateNode(int vertexOffset) {
+		int vertexCount = CreateVertices(vertexOffset);
+		CreateTriangles();
+
+		return vertexCount;
+	}
+
+	private int CreateVertices(int vertexOffset) {
 		Vertices = new List<Vector3>();
 		VertexIndices = new int[Resolution, Resolution];
 
@@ -44,6 +45,8 @@ public class PlanetChunk {
 				VertexIndices[x, y] = globalIndex;
 			}
 		}
+
+		return Vertices.Count;
 	}
 
 	private void AddTriangle(int a, int b, int c) {
@@ -52,7 +55,7 @@ public class PlanetChunk {
 		Triangles.Add(c);
 	}
 
-	private void CreateTriangles () {
+	private void CreateTriangles() {
 		Triangles = new List<int>();
 
 		for (int index = 0, y = 0; y < Resolution - 1; y++) {
@@ -77,5 +80,5 @@ public class PlanetChunk {
 	public Vector3 AxisB { get; }
 	public Vector3 Position { get; }
 	public float ScaleFactor { get; }
-	public int Depth { get; }
+	public int DetailLevel { get; }
 }

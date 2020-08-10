@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class PlanetFace {
 	private readonly Vector3 localUp;
+	private readonly Transform faceTransform;
 	private readonly Vector3 axisA;
 	private readonly Vector3 axisB;
-	private int currentVertex = 0;
 
-	private PlanetChunk chunk;
+	private IChunk chunk;
 
-	public PlanetFace (Vector3 localUp) {
+	public PlanetFace(Vector3 localUp, Transform faceTransform) {
 		this.localUp = localUp;
-
+		this.faceTransform = faceTransform;
 		axisA = new Vector3(localUp.y, localUp.z, localUp.x);
 		axisB = Vector3.Cross(localUp, axisA);
-		
-		chunk = new PlanetChunk(localUp, axisA, axisB, localUp, 1, 0, currentVertex);
+
+		chunk = new ChunkNode(faceTransform, localUp, axisA, axisB, localUp, 1, 0);
+		chunk.GenerateNode(0);
 	}
 
-	public (List<Vector3>, List<int>) CreateMeshData () => chunk.CreateMeshData();
+	public (List<Vector3>, List<int>) GetMeshData() => chunk.GetMeshData();
 }
